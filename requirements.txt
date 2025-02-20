@@ -5,3 +5,5 @@ huggingface-hub>=0.16.0
 pykakasi>=2.2.1
 jamdict
 jamdict-data
+loguru
+litellm
