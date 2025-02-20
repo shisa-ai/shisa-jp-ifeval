@@ -805,6 +805,10 @@ def main(input_file, debug):
     # Create output CSV filename in results directory
     input_basename = os.path.basename(input_file)
     output_csv = os.path.join(results_dir, os.path.splitext(input_basename)[0] + '_results.csv')
+    output_scores = os.path.join(results_dir, os.path.splitext(input_basename)[0] + '_scores.jsonl')
+    
+    # Keep track of test results
+    test_results = []
     
     with open(input_file, 'r') as f, open(output_csv, 'w', newline='') as csvfile:
         # Create CSV writer and write headers
@@ -826,6 +830,12 @@ def main(input_file, debug):
                     passed += 1
                 print(f"Result for {func_name}: {result}")
                 
+                # Keep track of test result
+                test_results.append({
+                    "task": func_name,
+                    "passed": result
+                })
+                
                 # Write to CSV
                 writer.writerow([func_name, processed_output, str(result)])
             else:
@@ -836,6 +846,23 @@ def main(input_file, debug):
     if total > 0:
         print(f"\nPassed {passed}/{total} ({(passed/total)*100:.1f}%)")
         print(f"Results have been saved to: {output_csv}")
+        
+        # Save scores to JSONL
+        with open(output_scores, 'w') as f:
+            # Write summary first
+            json.dump({
+                "total_score": {
+                    "passed": passed,
+                    "total": total,
+                    "percentage": round((passed/total)*100, 1)
+                }
+            }, f)
+            f.write('\n')
+            # Write individual test results
+            for result in test_results:
+                json.dump(result, f)
+                f.write('\n')
+        print(f"Scores have been saved to: {output_scores}")
 
 if __name__ == '__main__':
     main()

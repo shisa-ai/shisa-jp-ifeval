@@ -86,7 +86,7 @@ def main(model: str, api_base: str, max_workers: int, commercial_model: bool):
                 all_results.append(result)
     
     os.makedirs("output", exist_ok=True)
-    output_file = f"output/results_{model.replace('/', '__')}_multi_temp_results.jsonl"
+    output_file = f"output/results_{model.replace('/', '__')}_ifeval_output.jsonl"
     
     df = pd.DataFrame(all_results)
     df.to_json(output_file, orient='records', lines=True, force_ascii=False)
