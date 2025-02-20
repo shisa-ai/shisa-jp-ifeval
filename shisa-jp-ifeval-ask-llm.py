@@ -8,13 +8,13 @@ from helpers.llmcaller.litellm_caller import LiteLLMCaller
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Dict, Any
 
-def process_single_item(item: Dict[str, Any], llm: LiteLLMCaller, temperature: float) -> Dict[str, Any]:
+def process_single_item(item: Dict[str, Any], llm: LiteLLMCaller, temperature: float, max_tokens: int) -> Dict[str, Any]:
     try:
         prompt = item['prompt']
         response = llm.call(
             prompt=prompt,
             temperature=temperature,
-            max_tokens=8092
+            max_tokens=max_tokens,
         )
         result = {
             'guid': item['guid'],
@@ -39,10 +39,20 @@ def process_dataset(model: str, api_base: str, temperature: float, commercial_mo
     
     results = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_item = {
-            executor.submit(process_single_item, item, llm, temperature): item 
-            for item in dataset
-        }
+        future_to_item = {}
+        for item in dataset:
+            try:
+                max_tokens = 7000  # Initial attempt with larger context
+                future = executor.submit(process_single_item, item, llm, temperature, max_tokens)
+                future_to_item[future] = item
+            except Exception as e:
+                try:
+                    max_tokens = 4096  # Fallback to smaller context
+                    future = executor.submit(process_single_item, item, llm, temperature, max_tokens)
+                    future_to_item[future] = item
+                except Exception as e:
+                    logger.error(f"Failed to process item {item['guid']} even with reduced tokens: {str(e)}")
+                    continue
         
         for future in as_completed(future_to_item):
             result = future.result()
@@ -76,11 +86,22 @@ def main(model: str, api_base: str, max_workers: int, commercial_model: bool):
     
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Create all tasks upfront for all temperatures
-        future_to_params = {
-            executor.submit(process_single_item, item, llm, temp): (item, temp)
-            for temp in temperatures
-            for item in dataset
-        }
+        future_to_params = {}
+        for temp in temperatures:
+            for item in dataset:
+                # No task should exceed 1000 input tokens...
+                try:
+                    max_tokens = 7000  # Initial attempt with larger context
+                    future = executor.submit(process_single_item, item, llm, temp, max_tokens)
+                    future_to_params[future] = (item, temp)
+                except Exception as e:
+                    try:
+                        max_tokens = 4096  # Fallback to smaller context
+                        future = executor.submit(process_single_item, item, llm, temp, max_tokens)
+                        future_to_params[future] = (item, temp)
+                    except Exception as e:
+                        logger.error(f"Failed to process item {item['guid']} at temperature {temp} even with reduced tokens: {str(e)}")
+                        continue
         
         for future in as_completed(future_to_params):
             result = future.result()
