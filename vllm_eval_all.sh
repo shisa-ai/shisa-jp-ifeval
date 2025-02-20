@@ -5,7 +5,6 @@ rm -rf output/* results/*
 
 # Array of models to evaluate
 declare -a models=(
-    "shisa-ai/Llama-3.1-Tulu-3-405B-FP8-Dynamic"
     "allenai/Llama-3.1-Tulu-3-8B"
     "tokyotech-llm/Llama-3.1-Swallow-70B-Instruct-v0.3"
     "allenai/Llama-3.1-Tulu-3-70B"
