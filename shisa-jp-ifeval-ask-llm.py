@@ -54,7 +54,7 @@ def process_dataset(model: str, api_base: str, temperature: float, commercial_mo
 @click.command()
 @click.option('--model', required=True, help='Model name')
 @click.option('--api-base', required=False, default="", help='API base URL')
-@click.option('--max-workers', default=30, help='Number of concurrent threads')
+@click.option('--max-workers', default=128, help='Number of concurrent threads')
 @click.option('--commercial-model', is_flag=True, default=False, help='Set to True if using a commercial API like OpenAI or Anthropic')
 def main(model: str, api_base: str, max_workers: int, commercial_model: bool):
     """Main function to run the evaluation at multiple temperatures in parallel."""
