@@ -66,6 +66,9 @@ def main(model: str, api_base: str, max_workers: int, commercial_model: bool):
     # Load dataset once
     dataset = load_dataset("shisa-ai/shisa-jp-if-eval", split="train")
     
+    # Store original model name for output file
+    original_model = model
+    
     if not commercial_model:
         model = "hosted_vllm/" + model
     logger.info(f"Accessing model {model}")
@@ -86,7 +89,8 @@ def main(model: str, api_base: str, max_workers: int, commercial_model: bool):
                 all_results.append(result)
     
     os.makedirs("output", exist_ok=True)
-    output_file = f"output/results_{model.replace('/', '__')}_ifeval_output.jsonl"
+    # Use original model name for output file
+    output_file = f"output/{original_model.replace('/', '__')}_ifeval_output.jsonl"
     
     df = pd.DataFrame(all_results)
     df.to_json(output_file, orient='records', lines=True, force_ascii=False)

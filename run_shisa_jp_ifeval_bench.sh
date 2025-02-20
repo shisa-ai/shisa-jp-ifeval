@@ -27,7 +27,7 @@ fi
 # Get the output file name (matches the pattern in ask-llm.py)
 # Replace / with __ in model name to match Python's sanitization
 SAFE_MODEL=${MODEL//\//__}
-OUTPUT_FILE="output/results_hosted_vllm__${SAFE_MODEL}_ifeval_output.jsonl"
+OUTPUT_FILE="output/${SAFE_MODEL}_ifeval_output.jsonl"
 
 # Check if the output file exists
 if [ ! -f "$OUTPUT_FILE" ]; then
@@ -47,5 +47,5 @@ fi
 
 echo "Evaluation complete!"
 echo "Results can be found in:"
-echo "- Detailed results: results/results_hosted_vllm__${SAFE_MODEL}_ifeval_output_results.csv"
-echo "- Scores: results/results_hosted_vllm__${SAFE_MODEL}_ifeval_output_scores.jsonl"
+echo "- Detailed results: results/${SAFE_MODEL}_ifeval_output_results.csv"
+echo "- Scores: results/${SAFE_MODEL}_ifeval_output_scores.jsonl"
