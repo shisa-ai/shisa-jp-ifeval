@@ -4,3 +4,4 @@ curator/
 *.jsonl
 *.arrow
 *.csv
+*.pyc
