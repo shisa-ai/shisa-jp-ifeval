@@ -37,7 +37,7 @@ fi
 
 # Step 2: Run the evaluation
 echo "Step 2: Running evaluation..."
-python shisa-jp-if-eval-judge.py "$OUTPUT_FILE"
+python shisa-jp-ifeval-judge.py "$OUTPUT_FILE"
 
 # Check if the evaluation was successful
 if [ $? -ne 0 ]; then
