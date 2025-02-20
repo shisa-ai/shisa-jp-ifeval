@@ -28,13 +28,13 @@ def process_single_item(item: Dict[str, Any], llm: LiteLLMCaller, temperature: f
         logger.error(f"Error processing item {item['guid']}: {str(e)}")
         return None
 
-def process_dataset(model: str, api_base: str, temperature: float, commercial_model: bool = False, max_workers: int = 4):
+def process_dataset(model: str, api_base: str, temperatures: list[float], commercial_model: bool = False, max_workers: int = 4):
     """Process the dataset by sending prompts to the LLM using multiple threads."""
     dataset = load_dataset("shisa-ai/shisa-jp-if-eval", split="train")
     
     if not commercial_model:
         model = "hosted_vllm/" + model
-
+    logger.info ("Accessing model {model}")
     llm = LiteLLMCaller(model=model, api_base=api_base)
     
     results = []
@@ -54,19 +54,27 @@ def process_dataset(model: str, api_base: str, temperature: float, commercial_mo
 @click.command()
 @click.option('--model', required=True, help='Model name')
 @click.option('--api-base', required=False, default="", help='API base URL')
-@click.option('--temperature', default=0.7, help='Temperature for sampling')
 @click.option('--max-workers', default=12, help='Number of concurrent threads')
 @click.option('--commercial-model', is_flag=True, default=False, help='Set to True if using a commercial API like OpenAI or Anthropic')
-def main(model: str, api_base: str, temperature: float, max_workers: int, commercial_model: bool):
-    """Main function to run the evaluation."""
+def main(model: str, api_base: str, max_workers: int, commercial_model: bool):
+    """Main function to run the evaluation at multiple temperatures."""
     logger.info(f"Starting evaluation with model {model} using {max_workers} threads")
     
-    results = process_dataset(model, api_base, temperature, commercial_model, max_workers)
+    temperatures = [0.0, 0.2, 0.5, 0.7, 1.0]
+    all_results = []
+    
+    for temp in temperatures:
+        logger.info(f"Running evaluation at temperature {temp}")
+        results = process_dataset(model, api_base, temp, commercial_model, max_workers)
+        # Add temperature to each result
+        for result in results:
+            result['temperature'] = temp
+        all_results.extend(results)
     
     os.makedirs("output", exist_ok=True)
-    output_file = f"output/results_{model.replace('/', '--')}.jsonl"
+    output_file = f"output/results_{model.replace('/', '__')}_multi_temp_results.jsonl"
     
-    df = pd.DataFrame(results)
+    df = pd.DataFrame(all_results)
     df.to_json(output_file, orient='records', lines=True, force_ascii=False)
     
     logger.info(f"Evaluation complete. Results saved to {output_file}")
