@@ -3,6 +3,7 @@ import os
 import glob
 import subprocess
 import pandas as pd
+import json
 from pathlib import Path
 
 def run_evaluation(jsonl_file):
@@ -51,6 +52,24 @@ def create_wide_format_results(results_dir):
     
     return results_df
 
+def get_model_scores(results_dir):
+    """Get scores for each model from their scores.jsonl files."""
+    scores = {}
+    score_files = glob.glob(os.path.join(results_dir, '*_scores.jsonl'))
+    
+    for score_file in score_files:
+        model_name = os.path.basename(score_file).replace('_scores.jsonl', '')
+        try:
+            with open(score_file, 'r') as f:
+                # First line contains the total score
+                total_score = json.loads(f.readline())
+                scores[model_name] = total_score['total_score']
+        except Exception as e:
+            print(f"Error reading scores for {model_name}: {e}")
+            continue
+    
+    return scores
+
 def main():
     # Get the base directory (where this script is located)
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -87,19 +106,11 @@ def main():
     combined_df.to_csv(combined_output)
     print(f"\nAll results have been combined in: {combined_output}")
     
-    # Calculate and print success rates for each model
-    print("\nSuccess rates by model:")
-    models = {col.replace('_success', ''): col 
-             for col in combined_df.columns if col.endswith('_success')}
-    
-    for model, col in models.items():
-        # Get non-nan values and calculate success rate
-        valid_results = combined_df[col].dropna()
-        if len(valid_results) > 0:
-            success_rate = (valid_results == True).mean() * 100
-            print(f"{model}: {success_rate:.2f}% ({len(valid_results)} tasks)")
-        else:
-            print(f"{model}: No valid results")
+    # Get and print scores from JSONL files
+    print("\nScores by model:")
+    scores = get_model_scores(results_dir)
+    for model, score in scores.items():
+        print(f"{model}: {score['percentage']}% ({score['passed']}/{score['total']} tasks)")
 
 if __name__ == '__main__':
     main()
