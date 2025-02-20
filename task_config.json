@@ -2,6 +2,9 @@
     "CharacterLimit": {
         "max_length": 200
     },
+    "CharacterMinimum": {
+        "min_length": 600
+    },
     "NoKatakana": {},
     "KeywordFrequency": {
         "keyword": "山",

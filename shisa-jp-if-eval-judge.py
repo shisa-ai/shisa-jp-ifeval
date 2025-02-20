@@ -743,11 +743,22 @@ def SeasonalWords(text, prompt=None):
     # Return True if we found at least the required number of kigo
     return len(found_kigo) >= required_count
 
+def CharacterMinimum(text, prompt=None):
+    # Get min_length from config
+    min_length = TASK_CONFIG['CharacterMinimum']['min_length']
+    
+    if DEBUG:
+        logger.debug(f"[CharacterMinimum] Required minimum length: {min_length}")
+        logger.debug(f"[CharacterMinimum] Actual length: {len(text)}")
+        
+    return len(text) >= min_length
+
 # Map of function names to actual functions
 FUNCTION_MAP = {
     # Implemented functions
     'NoKatakana': NoKatakana,
     'CharacterLimit': CharacterLimit,
+    'CharacterMinimum': CharacterMinimum,
     'KeywordFrequency': KeywordFrequency,
     'RepeatPrompt': RepeatPrompt,
     'Shiritori': Shiritori,

@@ -57,19 +57,33 @@ def process_dataset(model: str, api_base: str, temperature: float, commercial_mo
 @click.option('--max-workers', default=30, help='Number of concurrent threads')
 @click.option('--commercial-model', is_flag=True, default=False, help='Set to True if using a commercial API like OpenAI or Anthropic')
 def main(model: str, api_base: str, max_workers: int, commercial_model: bool):
-    """Main function to run the evaluation at multiple temperatures."""
+    """Main function to run the evaluation at multiple temperatures in parallel."""
     logger.info(f"Starting evaluation with model {model} using {max_workers} threads")
     
     temperatures = [0.0, 0.2, 0.5, 0.7, 1.0]
     all_results = []
     
-    for temp in temperatures:
-        logger.info(f"Running evaluation at temperature {temp}")
-        results = process_dataset(model, api_base, temp, commercial_model, max_workers)
-        # Add temperature to each result
-        for result in results:
-            result['temperature'] = temp
-        all_results.extend(results)
+    # Load dataset once
+    dataset = load_dataset("shisa-ai/shisa-jp-if-eval", split="train")
+    
+    if not commercial_model:
+        model = "hosted_vllm/" + model
+    logger.info(f"Accessing model {model}")
+    llm = LiteLLMCaller(model=model, api_base=api_base)
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Create all tasks upfront for all temperatures
+        future_to_params = {
+            executor.submit(process_single_item, item, llm, temp): (item, temp)
+            for temp in temperatures
+            for item in dataset
+        }
+        
+        for future in as_completed(future_to_params):
+            result = future.result()
+            if result is not None:
+                result['temperature'] = future_to_params[future][1]
+                all_results.append(result)
     
     os.makedirs("output", exist_ok=True)
     output_file = f"output/results_{model.replace('/', '__')}_multi_temp_results.jsonl"
