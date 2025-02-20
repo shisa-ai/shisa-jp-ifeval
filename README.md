@@ -9,7 +9,7 @@ This repository contains tools for evaluating LLM responses using LiteLLM.
 To generate results using LiteLLM, use the following script:
 
 ```bash
-python run_shisa-jp-ifeval-litellm.py --model MODEL [--api-base API_BASE] [--temperature TEMP] [--max-workers N]
+python run_shisa-jp-ifeval-litellm.py --model MODEL [--api-base API_BASE] [--temperature TEMP] [--max-workers N] [--commercial-model]
 ```
 
 Arguments:
@@ -17,6 +17,9 @@ Arguments:
 - `--api-base`: Base URL for the API endpoint (default: "")
 - `--temperature`: Sampling temperature (default: 0.7)
 - `--max-workers`: Number of concurrent threads (default: 12)
+- `--commercial-model`: Flag to indicate use of commercial APIs (default: False)
+
+Note: By default, this tool uses LiteLLM's `hosted_vllm` prefix for local testing. If you are using a commercial service like OpenAI, Anthropic, etc., please set the `--commercial-model` flag to prevent this prefix from being added.
 
 The results will be saved to the `results` folder.
 
