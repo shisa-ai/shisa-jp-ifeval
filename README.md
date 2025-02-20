@@ -14,7 +14,7 @@ MODEL="your-model-name" OPENAI_URL="http://your-api-endpoint/v1" ./run_shisa_jp_
 
 Example:
 ```bash
-MODEL="Nexusflow/Athene-V2-Chat" OPENAI_URL="http://athenev2/v1" JUDGE_URL="http://athenev2/v1" ./run_shisa_jp_ifeval_bench.sh
+MODEL="Nexusflow/Athene-V2-Chat" OPENAI_URL="http://athenev2/v1"  ./run_shisa_jp_ifeval_bench.sh
 ```
 
 
