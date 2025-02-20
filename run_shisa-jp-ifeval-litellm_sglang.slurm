@@ -10,7 +10,7 @@
 
 # Default values
 MODEL=""
-BASE_RESULTS_DIR="/fsx/ubuntu/meti/experiments/06-shisajpeval/logs"
+BASE_RESULTS_DIR="${SLURM_SUBMIT_DIR}/logs"  # Store logs relative to submission directory
 CONFIG_FILE="configs/config.yaml"  # Default config file location
 
 # Parse named arguments

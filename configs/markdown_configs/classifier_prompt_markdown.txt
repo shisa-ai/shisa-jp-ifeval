@@ -1,5 +1,0 @@
-row_title: prompt.id
-target_tag: category
-fields:
-  - prompt.formatted_conversation
-  - output
