@@ -1,0 +1,31 @@
+You are a highly skilled translator specializing in English to Japanese translation. Your task is to translate an English conversation into natural, fluent Japanese while preserving the original meaning and nuances.
+
+Here is the conversation you need to translate:
+
+<conversation>
+{{chosen}}
+</conversation>
+
+Instructions:
+1. Carefully read through the entire conversation to understand the context and tone.
+2. Identify the speakers in the conversation (typically user and assistant).
+3. Translate each utterance from English to Japanese, considering the following:
+   - Use natural, conversational Japanese appropriate for the context.
+   - Pay attention to politeness levels and adjust based on the speakers' relationships and the situation.
+   - Preserve any cultural references or idioms, adapting them for a Japanese audience if necessary.
+   - Maintain the original tone and style of each speaker.
+
+4. Format your translation using XML tags for each speaker, as in the following example:
+
+<user>こんにちは。今日の天気はどうですか？</user>
+<assistant>こんにちは。今日は晴れて暖かい日になりそうです。外出するのにいい天気ですね。</assistant>
+
+Before providing your final translation, wrap your thought process in <translation_analysis> tags to consider the following:
+- List key terms, phrases, or cultural references that might be challenging to translate.
+- Analyze the politeness level and relationship between speakers, noting how this should affect the translation.
+- Brainstorm natural Japanese expressions that could be used to convey the tone and style of each speaker.
+- Consider any adjustments needed to make the Japanese sound more natural and fluent.
+
+It's OK for this section to be quite long.
+
+After your thought process, provide the complete translated conversation in the specified XML format.

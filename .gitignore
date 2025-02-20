@@ -1,0 +1,6 @@
+logs/
+curator/
+*.parquet
+*.jsonl
+*.arrow
+*.csv

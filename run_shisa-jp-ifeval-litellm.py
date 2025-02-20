@@ -1,0 +1,83 @@
+import os
+import json
+import pandas as pd
+import click
+from datasets import load_dataset
+from loguru import logger
+from helpers.llmcaller.litellm_caller import LiteLLMCaller
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Dict, Any
+
+def process_single_item(item: Dict[str, Any], llm: LiteLLMCaller, temperature: float) -> Dict[str, Any]:
+    try:
+        prompt = item['prompt']
+        response = llm.call(
+            prompt=prompt,
+            temperature=temperature,
+            max_tokens=8092
+        )
+        result = {
+            'guid': item['guid'],
+            'prompt': prompt,
+            'task_type': item['task_type'],
+            'response': response
+        }
+        logger.info(f"Processed item {item['guid']}")
+        return result
+    except Exception as e:
+        logger.error(f"Error processing item {item['guid']}: {str(e)}")
+        return None
+
+def process_dataset(model: str, api_base: str, temperature: float, max_workers: int = 4):
+    """Process the dataset by sending prompts to the LLM using multiple threads."""
+    dataset = load_dataset("shisa-ai/shisa-jp-if-eval", split="train")
+    
+    if "localhost" in api_base or "http://10" in api_base:
+        model = "hosted_vllm/" + model
+
+    llm = LiteLLMCaller(model=model, api_base=api_base)
+    
+    results = []
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        future_to_item = {
+            executor.submit(process_single_item, item, llm, temperature): item 
+            for item in dataset
+        }
+        
+        for future in as_completed(future_to_item):
+            result = future.result()
+            if result is not None:
+                results.append(result)
+    
+    return results
+
+@click.command()
+@click.option('--model', required=True, help='Model name')
+@click.option('--api-base', required=False, default="", help='API base URL')
+@click.option('--temperature', default=0.7, help='Temperature for sampling')
+@click.option('--max-workers', default=12, help='Number of concurrent threads')
+def main(model: str, api_base: str, temperature: float, max_workers: int):
+    """Main function to run the evaluation."""
+    logger.info(f"Starting evaluation with model {model} using {max_workers} threads")
+    
+    results = process_dataset(model, api_base, temperature, max_workers)
+    
+    os.makedirs("output", exist_ok=True)
+    output_file = f"output/results_{model.replace('/', '--')}.jsonl"
+    
+    df = pd.DataFrame(results)
+    df.to_json(output_file, orient='records', lines=True, force_ascii=False)
+    
+    logger.info(f"Evaluation complete. Results saved to {output_file}")
+
+if __name__ == "__main__":
+    main()
+    output_file = f"output/results_{model.replace('/', '--')}.jsonl"
+    
+    df = pd.DataFrame(results)
+    df.to_json(output_file, orient='records', lines=True, force_ascii=False)
+    
+    logger.info(f"Evaluation complete. Results saved to {output_file}")
+
+if __name__ == "__main__":
+    main()

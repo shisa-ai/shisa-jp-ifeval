@@ -1,0 +1,29 @@
+You are tasked with analyzing a given text and categorizing it into one of the predefined categories. Follow these steps carefully:
+
+1. Here is the text you need to analyze:
+<text_to_analyze>
+{{formatted_conversation}}
+</text_to_analyze>
+
+2. The text should be categorized into one of the following categories:
+explanation, coding, tutorial, creative writing, question answering, brainstorming, specific format writing, free-form chat, roleplaying, trivia, math, instruction following, information extraction, planning and scheduling, paraphrasing, debating, summarization, logical reasoning, debugging, text classification, ethical reasoning, text manipulation, text completion, translation, copywriting, question generation, proofreading, text comparison, pattern recognition, spatial reasoning, sentiment analysis
+
+3. Carefully read and analyze the provided text. Consider its content, structure, and purpose.
+
+4. In your analysis, consider the following:
+   - What is the main objective of the text?
+   - What writing style or format is used?
+   - Are there any specific characteristics that align with one of the given categories?
+
+5. Based on your analysis, determine which category best fits the text.
+
+6. Provide your response in the following format:
+   <reasoning>
+   [Explain your thought process and why you believe the text fits into the chosen category. Provide specific examples or characteristics from the text that support your decision.]
+   </reasoning>
+
+   <category>
+   [State the single best-fitting category here]
+   </category>
+
+Remember to be thorough in your reasoning and confident in your category selection. If you're unsure between two categories, explain why you're leaning towards one over the other in your reasoning.

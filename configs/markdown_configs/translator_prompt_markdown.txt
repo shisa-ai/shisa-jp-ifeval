@@ -1,0 +1,5 @@
+row_title: prompt.id
+target_tag: assistant
+fields:
+  - prompt.formatted_conversations
+  - output

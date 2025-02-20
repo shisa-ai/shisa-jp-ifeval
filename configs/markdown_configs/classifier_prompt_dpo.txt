@@ -1,0 +1,5 @@
+row_title: prompt.id
+target_tag: category
+fields:
+  - prompt.rejected
+  - output

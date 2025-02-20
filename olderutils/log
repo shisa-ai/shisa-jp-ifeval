@@ -1,0 +1,27 @@
+[Wed Feb 12 09:40:46 UTC 2025] Checking models endpoint...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   517  100   517    0     0  12023      0 --:--:-- --:--:-- --:--:-- 12023
+{"object":"list","data":[{"id":"Llama-3.1-Tulu-3-405B-FP8-Dynamic","object":"model","created":1739353246,"owned_by":"vllm","root":"Llama-3.1-Tulu-3-405B-FP8-Dynamic","parent":null,"max_model_len":32768,"permission":[{"id":"modelperm-58dec3c6f63e4f55a6f7440bcf556ff5","object":"model_permission","created":1739353246,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}[Wed Feb 12 09:42:47 UTC 2025] Checking models endpoint...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   517  100   517    0     0   100k      0 --:--:-- --:--:-- --:--:--  100k
+{"object":"list","data":[{"id":"Llama-3.1-Tulu-3-405B-FP8-Dynamic","object":"model","created":1739353367,"owned_by":"vllm","root":"Llama-3.1-Tulu-3-405B-FP8-Dynamic","parent":null,"max_model_len":32768,"permission":[{"id":"modelperm-cb2d50080e364d4284ec49d76090d7b8","object":"model_permission","created":1739353367,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}[Wed Feb 12 09:43:32 UTC 2025] Checking models endpoint...
+curl: (3) URL using bad/illegal format or missing URL
+[Wed Feb 12 09:43:52 UTC 2025] Checking models endpoint...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   505  100   505    0     0   493k      0 --:--:-- --:--:-- --:--:--  493k
+{"object":"list","data":[{"id":"allenai/Llama-3.1-Tulu-3-8B","object":"model","created":1739353432,"owned_by":"vllm","root":"allenai/Llama-3.1-Tulu-3-8B","parent":null,"max_model_len":14000,"permission":[{"id":"modelperm-83c7d3dddf35474db5a037b2a86bd3fb","object":"model_permission","created":1739353432,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}[Wed Feb 12 09:48:17 UTC 2025] Checking models endpoint...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   507  100   507    0     0   495k      0 --:--:-- --:--:-- --:--:--  495k
+{"object":"list","data":[{"id":"allenai/Llama-3.1-Tulu-3-70B","object":"model","created":1739353697,"owned_by":"vllm","root":"allenai/Llama-3.1-Tulu-3-70B","parent":null,"max_model_len":14000,"permission":[{"id":"modelperm-1d558178fc4e4128bd74aa2be47c0e5a","object":"model_permission","created":1739353697,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}[Wed Feb 12 09:49:04 UTC 2025] Checking models endpoint...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   507  100   507    0     0   495k      0 --:--:-- --:--:-- --:--:--  495k
+{"object":"list","data":[{"id":"allenai/Llama-3.1-Tulu-3-70B","object":"model","created":1739353744,"owned_by":"vllm","root":"allenai/Llama-3.1-Tulu-3-70B","parent":null,"max_model_len":14000,"permission":[{"id":"modelperm-6aee4ce93de844a5b4302337732cb87e","object":"model_permission","created":1739353744,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}[Wed Feb 12 09:50:58 UTC 2025] Checking models endpoint...
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   507  100   507    0     0   495k      0 --:--:-- --:--:-- --:--:--  495k
+{"object":"list","data":[{"id":"allenai/Llama-3.1-Tulu-3-70B","object":"model","created":1739353859,"owned_by":"vllm","root":"allenai/Llama-3.1-Tulu-3-70B","parent":null,"max_model_len":14000,"permission":[{"id":"modelperm-21bf29ed90354a808beb885c2a37fa96","object":"model_permission","created":1739353859,"allow_create_engine":false,"allow_sampling":true,"allow_logprobs":true,"allow_search_indices":false,"allow_view":true,"allow_fine_tuning":false,"organization":"*","group":null,"is_blocking":false}]}]}

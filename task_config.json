@@ -1,0 +1,91 @@
+{
+    "CharacterLimit": {
+        "max_length": 200
+    },
+    "NoKatakana": {},
+    "KeywordFrequency": {
+        "keyword": "山",
+        "min_frequency": 4
+    },
+    "NumberSentence": {
+        "expected_sentences": 4
+    },
+    "ForbiddenWords": {
+        "words": [ "申し訳","ごめん","悪い","失敗","気持ち"]
+    },
+    "NumberOfSections": {
+        "expected_sections": 4,
+        "separator": "***"
+    },
+    "CounterTask": {
+        "required_counters": ["台", "枚", "列"]
+    },
+    "PunctuationUse": {
+        "required_counts": {
+            "！": 3,
+            "？": 2,
+            "「」": 1
+        }
+    },
+    "NumberOfPlaceholders": {
+        "min_placeholders": 7
+    },
+    "ForbiddenParticle": {
+        "forbidden_particle": "を",
+        "min_length": 500
+    },
+    "KanjiCounter": {
+        "target_kanji": "瀬",
+        "required_count": 3
+    },
+    "CountHiragana": {
+        "expected_count": 28
+    },
+    "CountMora": {
+        "target_mora": ["ら", "り", "る", "れ", "ろ"],
+        "expected_count": 6
+    },
+    "DifferentFirstPersonPronouns": {
+        "pronouns": [
+            "私", "僕", "俺", "あたし", "わたくし", "わし", "おれ", "ぼく", "わたし",
+            "アタシ", "ウチ", "オイラ", "おいら", "手前", "てまえ", "拙者", "せっしゃ",
+            "小生", "しょうせい", "当方", "とうほう", "私め", "わたしめ", "我輩", "わがはい",
+            "余", "よ", "朕", "ちん", "愚生", "ぐせい", "小僧", "こぞう", "自分", "じぶん",
+            "あちき", "あっし", "儂", "わい", "おら", "おいどん", "ワシ", "ワタクシ",
+            "オレサマ", "オラ", "ミー", "あたい", "あたくし", "わて", "わい"
+        ],
+        "required_count": 5
+    },
+    "DifferentSecondPersonPronouns": {
+        "pronouns": [
+            "あなた", "君", "きみ", "お前", "おまえ", "貴様", "きさま", "貴方", "あんた",
+            "汝", "なんじ", "手前", "てまえ", "そなた", "そち", "貴殿", "きでん", "御身",
+            "おんみ", "お宅", "おたく", "てめえ", "てめー", "おめえ", "おめー", "キミ",
+            "アナタ", "アンタ", "おぬし", "己", "おのれ", "御前", "ごぜん", "そちら",
+            "そっち", "お客様", "おきゃくさま", "皆様", "みなさま", "諸君", "しょくん"
+        ],
+        "required_count": 5
+    },
+    "SeasonalWords": {
+        "required_count": 4
+    },
+    "MarkdownFormatting": {
+        "required_headers": {
+            "h2": "ツッコミ",
+            "h3": "ボケ"
+        },
+        "min_pairs": 3
+    },
+    "HonorificsInversion": {
+        "pairs": {
+            "あの人はは今資料を読んでいます。": "あの人は今資料をお読みになっています。"
+                        
+        }
+    },
+    "FuriganaRewrite": {
+        "expected_answers": [
+            "かんじのべんきょうはたのしい",
+            "猫背は整骨院で治してもらえる"
+        ]
+    }
+}

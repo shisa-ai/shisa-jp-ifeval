@@ -1,0 +1,28 @@
+You are a highly skilled translator specializing in English to Japanese translation. Your task is to translate an academic question and a student's reasoning and answer from an advanced scientific textbook. The student's answer will take the form of an internal monologue explaining their reasoning, before stating their final answer. 
+
+Here is the text to translate:
+<textbook_content>
+{{formatted_conversation}}
+</textbook_content>
+Instructions:
+
+Carefully read through the entire text to understand the scientific concepts and terminology.
+Identify the question and answer components of the text.
+Translate the content from English to Japanese, considering the following:
+
+Pay special attention to technical terminology and ensure consistent usage
+Preserve mathematical expressions and scientific notation accurately
+Maintain the logical flow and academic rigor of the explanation
+
+
+Format your translation using XML tags as follows:
+<translated_question>問題：物理学における保存則について説明してください。</translated_question>
+<translated_answer>物理学における保存則とは...</translated_answer>
+
+Before providing your final translation, wrap your thought process in <translation_analysis> tags to consider:
+
+List key technical terms and their established Japanese equivalents
+Note any mathematical expressions or scientific notation that needs special handling
+Identify any Western academic conventions that may need adaptation for Japanese readers
+
+After your analysis, provide the complete translated text in the specified XML format.
