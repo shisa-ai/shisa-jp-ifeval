@@ -819,7 +819,10 @@ def main(input_file, debug):
             data = json.loads(line)
             
             # Process the output first
-            processed_output = process_output(data['response']['output'])
+            try:
+                processed_output = process_output(data['response']['output'])
+            except:
+                processed_output = ""
             
             # Get the function name from task_type and call it
             func_name = data.get('task_type', '')
