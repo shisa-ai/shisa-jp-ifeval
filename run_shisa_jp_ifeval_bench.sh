@@ -16,7 +16,12 @@ echo "Using API base URL: $OPENAI_URL"
 
 # Step 1: Run the LLM querying
 echo "Step 1: Querying LLM..."
-python shisa-jp-ifeval-ask-llm.py --model "$MODEL" --api-base "$OPENAI_URL"
+if [ "$OPENAI_URL" = "https://api.openai.com/v1" ]; then
+    echo "Using OpenAI API"
+    python shisa-jp-ifeval-ask-llm.py --model "$MODEL" --api-base "$OPENAI_URL" --max-workers 32
+else
+    python shisa-jp-ifeval-ask-llm.py --model "$MODEL" --api-base "$OPENAI_URL"
+fi
 
 # Check if the LLM querying was successful
 if [ $? -ne 0 ]; then

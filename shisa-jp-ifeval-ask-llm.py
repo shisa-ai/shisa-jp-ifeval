@@ -28,50 +28,21 @@ def process_single_item(item: Dict[str, Any], llm: LiteLLMCaller, temperature: f
         logger.error(f"Error processing item {item['guid']}: {str(e)}")
         return None
 
-def process_dataset(model: str, api_base: str, temperature: float, commercial_model: bool = False, max_workers: int = 4):
-    """Process the dataset by sending prompts to the LLM using multiple threads."""
-    dataset = load_dataset("shisa-ai/shisa-jp-if-eval", split="train")
-
-    if not commercial_model:
-        model = "hosted_vllm/" + model
-    logger.info(f"Accessing model {model}")
-    llm = LiteLLMCaller(model=model, api_base=api_base)
-
-    results = []
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = []
-        for item in dataset:
-            # Only submit with the initial max_tokens - we'll handle fallback later
-            future = executor.submit(process_single_item, item, llm, temperature, 7000)
-            futures.append((future, item))
-
-        for future, item in futures:
-            try:
-                result = future.result()  # This will raise any exception from the task
-                if result is not None:
-                    results.append(result)
-            except Exception as e:
-                # Check if it's a token limit error
-                if "exceeds the model's maximum context length" in str(e):
-                    logger.info(f"Retrying item {item['guid']} with reduced tokens")
-                    try:
-                        # Directly process with reduced tokens instead of submitting to executor again
-                        result = process_single_item(item, llm, temperature, 3000)
-                        if result is not None:
-                            results.append(result)
-                    except Exception as retry_e:
-                        logger.error(f"Failed to process item {item['guid']} even with reduced tokens: {str(retry_e)}")
-                else:
-                    logger.error(f"Failed to process item {item['guid']}: {str(e)}")
-
-    return results
+def is_openai_model(model_name: str) -> bool:
+    """Determine if a model is an OpenAI model based on its name."""
+    openai_prefixes = [
+        "gpt-", "text-davinci-", "davinci", "curie", "babbage", "ada", 
+        "whisper", "claude", "text-embedding", "openai/", "openai:"
+    ]
+    return any(model_name.startswith(prefix) for prefix in openai_prefixes)
 
 @click.command()
 @click.option('--model', required=True, help='Model name')
 @click.option('--api-base', required=False, default="", help='API base URL')
+@click.option('--api-key', required=False, default=None, help='API key (or set OPENAI_API_KEY environment variable)')
 @click.option('--max-workers', default=128, help='Number of concurrent threads')
-@click.option('--commercial-model', is_flag=True, default=False, help='Set to True if using a commercial API like OpenAI or Anthropic')
-def main(model: str, api_base: str, max_workers: int, commercial_model: bool):
+@click.option('--commercial-model', is_flag=True, default=False, help='Set to True if using a commercial API (overrides auto-detection)')
+def main(model: str, api_base: str, api_key: str, max_workers: int, commercial_model: bool):
     """Main function to run the evaluation at multiple temperatures in parallel."""
     logger.info(f"Starting evaluation with model {model} using {max_workers} threads")
 
@@ -84,10 +55,21 @@ def main(model: str, api_base: str, max_workers: int, commercial_model: bool):
     # Store original model name for output file
     original_model = model
 
-    if not commercial_model:
+    # Auto-detect if it's a commercial model (unless explicitly specified)
+    is_commercial = commercial_model or is_openai_model(model)
+    
+    # For non-commercial models, add the hosted_vllm/ prefix
+    if not is_commercial:
         model = "hosted_vllm/" + model
-    logger.info(f"Accessing model {model}")
-    llm = LiteLLMCaller(model=model, api_base=api_base)
+    
+    logger.info(f"Accessing model {model} (Commercial API: {'Yes' if is_commercial else 'No'})")
+    
+    # Use API key if provided or from environment
+    api_key = api_key or os.environ.get("OPENAI_API_KEY")
+    if is_commercial and not api_key and "OPENAI_API_KEY" not in os.environ:
+        logger.warning("Using commercial model but no API key provided. Ensure it's set in the environment or authentication may fail.")
+    
+    llm = LiteLLMCaller(model=model, api_base=api_base, api_key=api_key)
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Create all tasks upfront for all temperatures

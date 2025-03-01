@@ -9,12 +9,13 @@ from .base import LLMCaller, LLMResponse
 class LiteLLMCaller:
     """Implementation of LLMCaller using LiteLLM."""
     
-    def __init__(self, model: str, api_base: str):
+    def __init__(self, model: str, api_base: str, api_key: Optional[str] = None):
         """Initialize the LiteLLM caller.
         
         Args:
             model: Name of the model to use
             api_base: Base URL for the API
+            api_key: API key for authentication (optional)
         """
 
         self.model = model
@@ -23,7 +24,7 @@ class LiteLLMCaller:
         #litellm.set_verbose=True
 
         self.api_base = api_base
-        
+        self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
 
     def call(self,
              prompt: str,
@@ -55,45 +56,46 @@ class LiteLLMCaller:
                 self.api_base = f"https://bedrock-runtime.{region}.amazonaws.com"
             '''
 
+            call_params = {
+                "model": self.model,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            }
+
+            # Add API base if provided
+            if self.api_base:
+                call_params["api_base"] = self.api_base
+                
+            # Add API key if provided
+            if self.api_key:
+                call_params["api_key"] = self.api_key
+
             if 'gemini' in self.model:
                 safety_settings=[
-                {
-                    "category": "HARM_CATEGORY_HARASSMENT",
-                    "threshold": "BLOCK_NONE",
-                },
-                {
-                    "category": "HARM_CATEGORY_HATE_SPEECH",
-                    "threshold": "BLOCK_NONE",
-                },
-                {
-                    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                    "threshold": "BLOCK_NONE",
-                },
-                {
-                    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                    "threshold": "BLOCK_NONE",
-                },
-            ]
-                response = litellm.completion(
-                    model=self.model,
-                    messages=messages,
-                    api_base=self.api_base,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    safety_settings=safety_settings,
-                    **kwargs
-                )
-            else: 
-                response = litellm.completion(
-                    model=self.model,
-                    messages=messages,
-                    api_base=self.api_base,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    **kwargs
-                )
+                    {
+                        "category": "HARM_CATEGORY_HARASSMENT",
+                        "threshold": "BLOCK_NONE",
+                    },
+                    {
+                        "category": "HARM_CATEGORY_HATE_SPEECH",
+                        "threshold": "BLOCK_NONE",
+                    },
+                    {
+                        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                        "threshold": "BLOCK_NONE",
+                    },
+                    {
+                        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                        "threshold": "BLOCK_NONE",
+                    },
+                ]
+                call_params["safety_settings"] = safety_settings
 
+            # Add any additional kwargs
+            call_params.update(kwargs)
 
+            response = litellm.completion(**call_params)
 
             return LLMResponse(
                 output=response.choices[0].message.content,
