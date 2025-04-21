@@ -828,7 +828,11 @@ def main(input_file, debug):
             func_name = data.get('task_type', '')
             if func_name in FUNCTION_MAP:
                 total += 1
-                result = FUNCTION_MAP[func_name](processed_output, data.get('prompt', ''))
+                # Check if processed_output is empty and fail immediately if so
+                if len(processed_output.strip()) == 0:
+                    result = False
+                else:
+                    result = FUNCTION_MAP[func_name](processed_output, data.get('prompt', ''))
                 if result:
                     passed += 1
                 print(f"Result for {func_name}: {result}")
