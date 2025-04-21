@@ -41,8 +41,9 @@ def is_openai_model(model_name: str) -> bool:
 @click.option('--api-base', required=False, default="", help='API base URL')
 @click.option('--api-key', required=False, default=None, help='API key (or set OPENAI_API_KEY environment variable)')
 @click.option('--max-workers', default=128, help='Number of concurrent threads')
+@click.option('--max-tokens', default=4096, help='Maximum number of tokens for model responses')
 @click.option('--commercial-model', is_flag=True, default=False, help='Set to True if using a commercial API (overrides auto-detection)')
-def main(model: str, api_base: str, api_key: str, max_workers: int, commercial_model: bool):
+def main(model: str, api_base: str, api_key: str, max_workers: int, max_tokens: int, commercial_model: bool):
     """Main function to run the evaluation at multiple temperatures in parallel."""
     logger.info(f"Starting evaluation with model {model} using {max_workers} threads")
 
@@ -77,7 +78,7 @@ def main(model: str, api_base: str, api_key: str, max_workers: int, commercial_m
         for temp in temperatures:
             for item in dataset:
                 # Submit with initial max_tokens
-                future = executor.submit(process_single_item, item, llm, temp, 7000)
+                future = executor.submit(process_single_item, item, llm, temp, max_tokens)
                 futures.append((future, item, temp))
 
         for future, item, temp in futures:
@@ -91,8 +92,9 @@ def main(model: str, api_base: str, api_key: str, max_workers: int, commercial_m
                 if "exceeds the model's maximum context length" in str(e):
                     logger.info(f"Retrying item {item['guid']} at temperature {temp} with reduced tokens")
                     try:
-                        # Directly process with reduced tokens
-                        result = process_single_item(item, llm, temp, 3000)
+                        # Directly process with reduced tokens (75% of original max_tokens)
+                        reduced_tokens = int(max_tokens * 0.75)
+                        result = process_single_item(item, llm, temp, reduced_tokens)
                         if result is not None:
                             result['temperature'] = temp
                             all_results.append(result)
