@@ -25,6 +25,15 @@ def set_debug(debug_mode: bool):
         logger.info("Debug mode enabled")
 
 def process_output(output):
+    # Reasoning models emit <think>...</think> blocks before their answer.
+    # Strip them first so the rule-based instruction checks score only the
+    # answer (and not the reasoning, which would break strict format checks).
+    if not isinstance(output, str):
+        return "" if output is None else str(output)
+    output = re.sub(r'<think\b[^>]*>.*?</think>', '', output, flags=re.DOTALL | re.IGNORECASE)
+    # Drop a dangling unclosed <think> (e.g. truncated generation).
+    output = re.sub(r'<think\b[^>]*>.*\Z', '', output, flags=re.DOTALL | re.IGNORECASE)
+    output = output.strip()
     # Extract the text between <answer> tags from the response output
     pattern = r'<answer>(.*?)</answer>'
     match = re.search(pattern, output, re.DOTALL)
