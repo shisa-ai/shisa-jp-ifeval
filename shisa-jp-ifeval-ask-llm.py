@@ -29,10 +29,22 @@ def process_single_item(item: Dict[str, Any], llm: LiteLLMCaller, temperature: f
         return None
 
 def is_openai_model(model_name: str) -> bool:
-    """Determine if a model is an OpenAI model based on its name."""
+    """Heuristic to detect hosted/commercial API models based on their name."""
     openai_prefixes = [
-        "gpt-", "text-davinci-", "davinci", "curie", "babbage", "ada", 
-        "whisper", "claude", "text-embedding", "openai/", "openai:"
+        "gpt-",
+        "text-davinci-",
+        "davinci",
+        "curie",
+        "babbage",
+        "ada",
+        "whisper",
+        "claude",
+        "text-embedding",
+        "openai/",
+        "openai:",
+        # Treat Gemini models as “commercial” APIs so we expect a
+        # hosted endpoint + API key.
+        "gemini",
     ]
     return any(model_name.startswith(prefix) for prefix in openai_prefixes)
 
@@ -56,13 +68,11 @@ def main(model: str, api_base: str, api_key: str, max_workers: int, max_tokens: 
     # Store original model name for output file
     original_model = model
 
-    # Auto-detect if it's a commercial model (unless explicitly specified)
+    # Auto-detect if it's a commercial/hosted API model (unless explicitly specified).
+    # We no longer rewrite model names for local endpoints; callers should pass the
+    # exact model identifier exposed by their OpenAI-compatible server.
     is_commercial = commercial_model or is_openai_model(model)
-    
-    # For non-commercial models, add the hosted_vllm/ prefix
-    if not is_commercial:
-        model = "hosted_vllm/" + model
-    
+
     logger.info(f"Accessing model {model} (Commercial API: {'Yes' if is_commercial else 'No'})")
     
     # Use API key if provided or from environment

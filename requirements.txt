@@ -6,4 +6,3 @@ pykakasi>=2.2.1
 jamdict
 jamdict-data
 loguru
-litellm

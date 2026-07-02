@@ -1,114 +1,92 @@
 from typing import Any, Optional
 import os
 
-import litellm
 from loguru import logger
+from openai import OpenAI
 
 from .base import LLMCaller, LLMResponse
 
+
 class LiteLLMCaller:
-    """Implementation of LLMCaller using LiteLLM."""
-    
+    """Implementation of LLMCaller using direct OpenAI-compatible clients.
+
+    Despite the name, this no longer depends on litellm; it is kept for
+    backwards compatibility with existing scripts.
+    """
+
     def __init__(self, model: str, api_base: str, api_key: Optional[str] = None):
-        """Initialize the LiteLLM caller.
-        
+        """Initialize the caller.
+
         Args:
-            model: Name of the model to use
-            api_base: Base URL for the API
-            api_key: API key for authentication (optional)
+            model: Name of the model to use.
+            api_base: Base URL for the API (OpenAI-compatible endpoint).
+            api_key: API key for authentication (optional).
         """
 
         self.model = model
-        #Turn these on to enable debug mode. 
-        #os.environ['LITELLM_LOG'] = 'DEBUG'
-        #litellm.set_verbose=True
-
         self.api_base = api_base
         self.api_key = api_key or os.environ.get("OPENAI_API_KEY")
 
-    def call(self,
-             prompt: str,
-             temperature: float = 0.0,
-             max_tokens: int = 512,
-             system_prompt: Optional[str] = None,
-             **kwargs: Any) -> LLMResponse:
-        """Make a call to the language model using LiteLLM.
-        
+    def call(
+        self,
+        prompt: str,
+        temperature: float = 0.0,
+        max_tokens: int = 512,
+        system_prompt: Optional[str] = None,
+        **kwargs: Any,
+    ) -> LLMResponse:
+        """Make a call to the language model.
+
         Args:
-            prompt: The prompt to send to the model
-            temperature: Sampling temperature
-            max_tokens: Maximum tokens to generate
-            system_prompt: Optional system prompt to prepend before the user message
-            **kwargs: Additional parameters to pass to litellm.completion
-            
+            prompt: The prompt to send to the model.
+            temperature: Sampling temperature.
+            max_tokens: Maximum tokens to generate.
+            system_prompt: Optional system prompt to prepend.
+            **kwargs: Additional parameters (unused for now).
+
         Returns:
-            Standardized LLMResponse
+            Standardized LLMResponse.
         """
-        try:            
-            # Create messages for API call
+        try:
+            client_kwargs = {}
+            if self.api_key:
+                client_kwargs["api_key"] = self.api_key
+            if self.api_base:
+                client_kwargs["base_url"] = self.api_base
+
+            client = OpenAI(**client_kwargs)
+
             messages = []
             if system_prompt:
                 messages.append({"role": "system", "content": system_prompt})
             messages.append({"role": "user", "content": prompt})
-            '''
-            if self.model.startswith("bedrock"):
-                region = os.getenv('AWS_DEFAULT_REGION', 'us-west-2')
-                self.api_base = f"https://bedrock-runtime.{region}.amazonaws.com"
-            '''
 
-            call_params = {
-                "model": self.model,
-                "messages": messages,
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-            }
+            response = client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
 
-            # Add API base if provided
-            if self.api_base:
-                call_params["api_base"] = self.api_base
-                
-            # Add API key if provided
-            if self.api_key:
-                call_params["api_key"] = self.api_key
+            choice = response.choices[0] if response.choices else None
+            message = getattr(choice, "message", None) if choice is not None else None
+            content = getattr(message, "content", None) if message is not None else None
 
-            if 'gemini' in self.model:
-                safety_settings=[
-                    {
-                        "category": "HARM_CATEGORY_HARASSMENT",
-                        "threshold": "BLOCK_NONE",
-                    },
-                    {
-                        "category": "HARM_CATEGORY_HATE_SPEECH",
-                        "threshold": "BLOCK_NONE",
-                    },
-                    {
-                        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-                        "threshold": "BLOCK_NONE",
-                    },
-                    {
-                        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-                        "threshold": "BLOCK_NONE",
-                    },
-                ]
-                call_params["safety_settings"] = safety_settings
-
-            # Add any additional kwargs
-            call_params.update(kwargs)
-
-            response = litellm.completion(**call_params)
+            if content is None:
+                content = ""
 
             return LLMResponse(
-                output=response.choices[0].message.content,
-                generated_tokens=response.usage.completion_tokens,
+                output=str(content),
+                generated_tokens=getattr(getattr(response, "usage", None), "completion_tokens", 0),
                 status="success",
-                error=None
+                error=None,
             )
-            
+
         except Exception as e:
-            logger.error(f"Error in LiteLLM call: {e}")
+            logger.error(f"Error in OpenAI-compatible call: {e}")
             return LLMResponse(
                 output=None,
                 generated_tokens=0,
                 status="error",
-                error=str(e)
+                error=str(e),
             )

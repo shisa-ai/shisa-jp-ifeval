@@ -29,19 +29,19 @@ If you need more control, you can run the individual components:
 
 #### 1. Generating LLM Responses
 
-To generate responses using LiteLLM:
+To generate responses against an OpenAI-compatible endpoint:
 
 ```bash
 python shisa-jp-ifeval-ask-llm.py --model MODEL [--api-base API_BASE] [--max-workers N] [--commercial-model]
 ```
 
 Arguments:
-- `--model`: (Required) Name of the model to use
+- `--model`: (Required) Name of the model to use (must match what your endpoint returns from `/v1/models`)
 - `--api-base`: Base URL for the API endpoint (default: "")
 - `--max-workers`: Number of concurrent threads (default: 30)
-- `--commercial-model`: Flag to indicate use of commercial APIs (default: False)
+- `--commercial-model`: Flag to indicate use of commercial APIs (default: False, used only for logging/warnings)
 
-Note: By default, this tool uses LiteLLM's `hosted_vllm` prefix for local testing. If you are using a commercial service like OpenAI, Anthropic, etc., set the `--commercial-model` flag.
+Note: The script no longer rewrites model names or adds a `hosted_vllm/` prefix automatically. If you are talking to a router that expects a prefix (e.g. `hosted_vllm/your-model`), pass that full identifier via `--model`. For local vLLM servers, use the exact model id shown by `/v1/models` (for example, `shisa-ai/175-llama3.3-70b-v2.1-dpo`).
 
 The responses will be saved to `output/{model}_ifeval_output.jsonl`
 
